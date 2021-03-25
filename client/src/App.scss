@@ -2,6 +2,10 @@
   text-align: center;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -34,5 +38,35 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+.wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 40px;
+
+  > .MuiPaper-root {
+    width: 90%;
+  }
+  
+  .dashboard {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #36989b;
+    padding: 20px 0;
+
+    .left {
+      width: 70%;
+    }
+  }
+
+  .choose-device {
+    margin-bottom: 10px;
   }
 }
