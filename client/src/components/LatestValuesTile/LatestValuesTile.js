@@ -31,7 +31,7 @@ const LatestValuesTile = ({ deviceId, pressure, strokeRate1 }) => {
         type: 'gauge',
         startAngle: 90,
         endAngle: -270,
-        max: pressure * 2,
+        max: 160,
         pointer: {
             show: false
         },
@@ -94,7 +94,8 @@ const LatestValuesTile = ({ deviceId, pressure, strokeRate1 }) => {
         type: 'gauge',
         startAngle: 90,
         endAngle: -270,
-        max: strokeRate1 * 2,
+        min: 20,
+        max: 60,
         pointer: {
             show: true
         },
@@ -124,7 +125,7 @@ const LatestValuesTile = ({ deviceId, pressure, strokeRate1 }) => {
             color: '#999',
             fontSize: 12,
             formatter: function (value) {
-                if (value === 0) {
+                if (value === 20) {
                     return '';
                 }
                 return value + '°';
