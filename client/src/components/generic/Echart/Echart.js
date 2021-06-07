@@ -5,12 +5,16 @@ const Echart = ({ option }) => {
   const myChart = useRef(null);
 
   useEffect(() => {
-    const chart = echarts.init(myChart.current);
-    chart.setOption(option);
+    let instance = echarts.getInstanceByDom(myChart.current);
 
-    window.addEventListener("resize", () => chart.resize());
+    if (!instance) {
+      instance = echarts.init(myChart.current);
+    }
+    instance.setOption(option);
 
-    return window.removeEventListener("resize", () => chart.resize());
+    window.addEventListener("resize", () => instance.resize());
+
+    return window.removeEventListener("resize", () => instance.resize());
   }, [option])
 
   return (

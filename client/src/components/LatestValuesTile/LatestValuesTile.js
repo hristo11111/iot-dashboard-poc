@@ -3,29 +3,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import Tile from '../generic/Tile/Tile';
 import Echart from '../generic/Echart/Echart';
 
-
-
-const optionTemperatures = {
-  xAxis: {
-      type: 'category',
-      data: ['CV Left 1', 'CV Left 2', 'CV Right 1', 'CV Right 2', 'Oil'],
-      axisLabel: { interval: 0, rotate: 30 }
-  },
-  yAxis: {
-      type: 'value'
-  },
-  series: [{
-      data: [120, 200, 150, 80, 70],
-      type: 'bar',
-      itemStyle: {
-        normal: {
-            barBorderRadius: [5, 5, 0 ,0 ]
-        }
-      }
-  }]
-};
-
-const LatestValuesTile = ({ deviceId, pressure, strokeRate1 }) => {
+const LatestValuesTile = ({ deviceId, pressure, strokeRate1, barChartData }) => {
   const pressureOption = {
     series: [{
         type: 'gauge',
@@ -157,6 +135,27 @@ const LatestValuesTile = ({ deviceId, pressure, strokeRate1 }) => {
         }
     }]
   };
+
+  const optionTemperatures = {
+    xAxis: {
+        type: 'category',
+        data: ['CV Left 1', 'CV Left 2', 'CV Right 1', 'CV Right 2', 'Oil'],
+        axisLabel: { interval: 0, rotate: 30 }
+    },
+    yAxis: {
+        type: 'value'
+    },
+    series: [{
+        data: barChartData,
+        type: 'bar',
+        itemStyle: {
+          normal: {
+              barBorderRadius: [5, 5, 0 ,0 ]
+          }
+        }
+    }]
+  };
+
   return (
     <Tile title={`Waterjet readings: ${deviceId}`}> 
       <div className="latest-values-tile">

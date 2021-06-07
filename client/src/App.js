@@ -7,57 +7,40 @@ import DeviceSelect from './components/DeviceSelect/DeviceSelect';
 import LatestValuesTile from './components/LatestValuesTile/LatestValuesTile';
 import DetailsTile from './components/DetailsTile/DetailsTile';
 import KPIsLineChart from './components/KPIsLineChart/KPIsLineChart';
+import { getCurrentValues } from './api/request';
 
 import './App.scss';
-
-const sitesArray = {
-  pressure: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=pressure',
-  // cv_1l_temp: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=cv_1l_temp',
-  // cv_2l_temp: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=cv_2l_temp',
-  // cv_1r_temp: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=cv_1r_temp',
-  // cv_2r_temp: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=cv_2r_temp',
-  // oil_temp: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=oil_temp',
-  stroke_rate_1: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=stroke_rate_1',
-  // pump_hour: 'https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=pump_hour'
-}
 
 function App() {
   const [device, setDevice] = useState('MyPythonDevice');
   const [pressure, setPressure] = useState(-1);
   const [strokeRate1, setStrokeRate1] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
+  const [barChartData, setBarChartData] = useState([])
+  const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState(new Date());
+  const [pumpHourLastValue, setPumpHourLastValue] = useState();
 
-  const getPressure = async () => {
-    const pressureResp = await fetch(`https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=pressure`,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-    pressureResp.json().then(res => { setPressure(res.pressure) });
-  }
+  const getData = async () => {
+    getCurrentValues()
+      .then(res => { 
+        const { cv_1l_temp, cv_1r_temp, cv_2l_temp, cv_2r_temp, oil_temp, pressure, pump_hour, stroke_rate_1 } = res;
+        
+        setStrokeRate1(stroke_rate_1); 
+        setPressure(pressure);
+        setBarChartData([ cv_1l_temp, cv_2l_temp, cv_1r_temp, cv_2r_temp, oil_temp ]);
+        setLastUpdatedTimestamp(res['iothub-enqueuedtime']);
+        setPumpHourLastValue(pump_hour);
 
-  const getStrokeRate1 = async () => {
-    setIsLoading(true);
-    const strokeRate1Resp = await fetch(`https://gettelemetrydatadocker.azurewebsites.net/api/GetData?deviceId=MyPythonDevice&function=GetCurrentValue&kpi=stroke_rate_1`,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      strokeRate1Resp.json().then(res => { setStrokeRate1(res.stroke_rate_1); setIsLoading(false) });
+        setIsLoading(false) 
+      });
   }
 
   useEffect(() => {
     setInterval(() => {
-      getPressure();
-      getStrokeRate1();
-    }, 20000);
+      getData();
+    }, 1000);
 
-    getPressure();
-    getStrokeRate1()
+    getData();
   }, []);
 
   const onDeviceSelectHandler = (event) => {
@@ -75,10 +58,10 @@ function App() {
             <div className="dashboard">
               <div className="left">
                 <KPIsLineChart deviceId={device} />
-                <LatestValuesTile deviceId={device} pressure={pressure} strokeRate1={strokeRate1} />
+                <LatestValuesTile deviceId={device} pressure={pressure} strokeRate1={strokeRate1} barChartData={barChartData} />
               </div>
               <div className="right">
-                <DetailsTile pumpHours={3313} lastReportTime={format(new Date(), 'dd-MM-yyyy, HH:mm:ss')} isLoading={isLoading} />
+                <DetailsTile pumpHours={pumpHourLastValue} lastReportTime={format(new Date(lastUpdatedTimestamp), 'dd-MM-yyyy, HH:mm:ss')} isLoading={isLoading} />
               </div>
             </div>
           </Paper>

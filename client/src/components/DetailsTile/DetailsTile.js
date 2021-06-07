@@ -1,10 +1,9 @@
-
 import Tile from '../generic/Tile/Tile';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import './DetailsTile.scss';
 
-const DetailsTile = ({ pumpHours, lastReportTime, isLoading }) => {
+const DetailsTile = ({ lastReportTime, isLoading, pumpHours }) => {
   return (
     <div className="details-wrapper">
       <Tile title="Current Pump Hours">
